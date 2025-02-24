@@ -1,0 +1,10 @@
+{
+  "variants":
+  {
+    "normal": { "model": "icraft:caseblock" },
+    "facing=north": { "model": "icraft:caseblock" },
+    "facing=south": { "model": "icraft:caseblock", "y": 180 },
+    "facing=west":  { "model": "icraft:caseblock", "y": 270 },
+    "facing=east":  { "model": "icraft:caseblock", "y": 90 }
+  }
+}

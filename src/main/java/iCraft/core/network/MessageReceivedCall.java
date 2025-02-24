@@ -1,0 +1,62 @@
+package iCraft.core.network;
+
+import iCraft.core.ICraft;
+import iCraft.core.utils.ICraftUtils;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+
+public class MessageReceivedCall extends MessageBase<MessageReceivedCall> {
+   private int status;
+   private boolean isCalling;
+
+   public MessageReceivedCall() {
+   }
+
+   public MessageReceivedCall(int status, boolean isCalling) {
+      this.status = status;
+      this.isCalling = isCalling;
+   }
+
+   public void fromBytes(ByteBuf buf) {
+      this.status = buf.readInt();
+      this.isCalling = buf.readBoolean();
+   }
+
+   public void toBytes(ByteBuf buf) {
+      buf.writeInt(this.status);
+      buf.writeBoolean(this.isCalling);
+   }
+
+   public void handleClientSide(MessageReceivedCall message, EntityPlayer player) {
+      player.closeScreen();
+      player.openGui(ICraft.instance, message.status, player.world, 0, 0, 0);
+      ItemStack itemStack = player.getHeldItemMainhand();
+      if (itemStack.getTagCompound() != null && itemStack.getTagCompound().hasKey("isCalling") && !itemStack.getTagCompound().getBoolean("isCalling")) {
+         ICraft.proxy.stopPhoneRingSound();
+      }
+
+   }
+
+   public void handleServerSide(MessageReceivedCall message, EntityPlayer player) {
+      ItemStack itemStack = player.getHeldItemMainhand();
+      switch (message.status) {
+         case 0:
+            ICraftUtils.changeCalledStatus(itemStack, 0, 0, message.isCalling);
+            this.updateGui(itemStack, 0, message.isCalling, player.world);
+            break;
+         case 7:
+            ICraftUtils.changeCalledStatus(itemStack, 2, 2, message.isCalling);
+            this.updateGui(itemStack, 7, message.isCalling, player.world);
+            break;
+         default:
+            ICraft.logger.error("Fatal Error while handling Received Call Packet at " + player.posX + ";" + player.posY + ";" + player.posZ + "\n" + "Culpa do Ratao");
+      }
+   }
+
+   private void updateGui(ItemStack itemStack, int status, boolean isCalling, World world) {
+      NetworkHandler.sendTo(new MessageReceivedCall(status, isCalling), (EntityPlayerMP) world.getPlayerEntityByName(isCalling ? itemStack.getTagCompound().getString("calledPlayer") : itemStack.getTagCompound().getString("callingPlayer")));
+   }
+}

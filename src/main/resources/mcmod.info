@@ -1,0 +1,15 @@
+[
+{
+  "modid": "icraft",
+  "name": "iCraft",
+  "description": "Smartphones in MineCraft",
+  "version": "1.0",
+  "mcversion": "1.12.2",
+  "url": "https://www.curseforge.com/minecraft/mc-mods/icraft-port",
+  "updateUrl": "",
+  "authorList": ["V5 MINECRAFT"],
+  "credits": "",
+  "logoFile": "logo.png",
+  "screenshots": []
+}
+]
